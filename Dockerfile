@@ -35,20 +35,20 @@ RUN \
 RUN make -j 8 -&& make install && paxctl -cm /usr/bin/node
 
 # install nexe
-RUN npm install -g nexe@${NEXE_VERSION}
+#RUN npm install -g nexe@${NEXE_VERSION}
 
 # remove node binary
-RUN rm out/Release/node
+#RUN rm out/Release/node
 
 # Change back to root folder
-WORKDIR /
+#WORKDIR /
 
 ## Add dummy sample to create the all-in-one ready-to-use package
-RUN echo "console.log('hello world')" >> index.js
+#RUN echo "console.log('hello world')" >> index.js
 
 # Build pre-asssembly of nodejs by using nexe and reusing our patched nodejs folder
-RUN nexe --build --no-mangle --temp / -c="--fully-static" -m="-j8" --target ${NODE_VERSION} -o pre-assembly-nodejs-static
+#RUN nexe --build --no-mangle --temp / -c="--fully-static" -m="-j8" --target ${NODE_VERSION} -o pre-assembly-nodejs-static
 
 # ok now make the image smaller with only the binary
-FROM alpine:3.11.6 as runtime
-COPY --from=builder /pre-assembly-nodejs-static /pre-assembly-nodejs-static
+#FROM alpine:3.11.6 as runtime
+#COPY --from=builder /pre-assembly-nodejs-static /pre-assembly-nodejs-static
