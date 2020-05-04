@@ -18,7 +18,7 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [ 'linux/arm/v7', 'linux/amd64', 'linux/arm64', 'linux/ppc64le', 'linux/s390' ]
+        platform: [ 'linux/arm/v7', 'linux/amd64', 'linux/arm64', 'linux/ppc64le', 'linux/s390x' ]
     env:
       IMAGE_NAME: quay.io/eclipse/che-custom-nodejs-deasync
     runs-on: ubuntu-latest
