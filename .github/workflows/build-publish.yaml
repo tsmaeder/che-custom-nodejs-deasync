@@ -40,6 +40,7 @@ jobs:
     - name: Docker build, tag, and push
       run: |
         IMAGE_VERSION=$(cat VERSION)
-        IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${{matrix.platform}}"
-        echo "Building version ${IMAGE_VERSION} of image ${IMAGE_NAME}"
+        PLATFORM=$(echo ${{matrix.platform}} | tr '\/' '-') 
+        IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}"
+        echo "Building ${IMAGE_WITH_TAG}"
         docker buildx build --cache-from=type=registry,ref=${IMAGE_WITH_TAG}--cache-to=type=registry,ref=${IMAGE_WITH_TAG},mode=max --platform "${{matrix.platform}}" -t "${IMAGE_WITH_TAG}" --push .
