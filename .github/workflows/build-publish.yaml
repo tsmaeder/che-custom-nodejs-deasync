@@ -16,6 +16,9 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        platform: [ 'linux/arm/v7', 'linux/amd64', 'linux/arm64', 'linux/ppc64le', 'linux/s390' ]
     env:
       IMAGE_NAME: quay.io/eclipse/che-custom-nodejs-deasync
     runs-on: ubuntu-latest
@@ -37,7 +40,6 @@ jobs:
     - name: Docker build, tag, and push
       run: |
         IMAGE_VERSION=$(cat VERSION)
-        IMAGE_PLATFORMS=$(cat .platforms)
-        IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}"
+        IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${{matrix.platform}}"
         echo "Building version ${IMAGE_VERSION} of image ${IMAGE_NAME}"
-        docker buildx build --cache-from=type=registry,ref=${IMAGE_WITH_TAG}--cache-to=type=registry,ref=${IMAGE_WITH_TAG},mode=max --platform "$IMAGE_PLATFORMS" -t "${IMAGE_WITH_TAG}" --push .
+        docker buildx build --cache-from=type=registry,ref=${IMAGE_WITH_TAG}--cache-to=type=registry,ref=${IMAGE_WITH_TAG},mode=max --platform "${{matrix.platform}}" -t "${IMAGE_WITH_TAG}" --push .
