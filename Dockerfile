@@ -8,9 +8,9 @@
 # Contributors:
 #   Red Hat, Inc. - initial API and implementation
 
-FROM alpine:3.11.3 as builder
+FROM alpine:3.11.6 as builder
 RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers paxctl libgcc libstdc++ git vim tar gzip wget
-ENV NODE_VERSION=10.19.0
+ENV NODE_VERSION=10.20.1
 ENV NEXE_VERSION=3.3.2
 RUN mkdir /${NODE_VERSION} && curl -sSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz | tar -zx --strip-components=1 -C /${NODE_VERSION}
 
@@ -50,5 +50,5 @@ RUN echo "console.log('hello world')" >> index.js
 RUN nexe --build --no-mangle --temp / -c="--fully-static" -m="-j8" --target ${NODE_VERSION} -o pre-assembly-nodejs-static
 
 # ok now make the image smaller with only the binary
-FROM alpine:3.11.3 as runtime
+FROM alpine:3.11.6 as runtime
 COPY --from=builder /pre-assembly-nodejs-static /pre-assembly-nodejs-static
