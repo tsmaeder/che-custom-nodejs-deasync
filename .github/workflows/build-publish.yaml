@@ -15,10 +15,16 @@ on:
       - 'master'
 
 jobs:
-  build:
+  define_platforms:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          echo ::set-env name=platforms::$(cat .platforms)
+  pre-compiler:
     strategy:
       matrix:
-        platform: [ 'linux/arm/v7', 'linux/arm64' ]
+        platform: ${{ steps.define_platforms.platforms }}
     env:
       IMAGE_NAME: quay.io/eclipse/che-custom-nodejs-deasync
     runs-on: ubuntu-latest
@@ -43,4 +49,4 @@ jobs:
         PLATFORM=$(echo ${{matrix.platform}} | tr '\/' '-') 
         IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-compile"
         echo "Building ${IMAGE_WITH_TAG} on platform ${{matrix.platform}}"
-        docker buildx build --cache-from=type=registry,ref=${IMAGE_WITH_TAG}--cache-to=type=registry,ref=${IMAGE_WITH_TAG},mode=max --platform "${{matrix.platform}}" -t "${IMAGE_WITH_TAG}" --push .
+        
