@@ -8,8 +8,9 @@
 # Contributors:
 #   Red Hat, Inc. - initial API and implementation
 
-ARG NODE_VERSION=10.20.1
+
 ARG NEXE_VERSION=3.3.2
+ARG NODE_VERSION=10.20.1
 # around 5 hours delay
 ARG TIMEOUT_DELAY=18000
 FROM alpine:3.11.6 as precompiler
