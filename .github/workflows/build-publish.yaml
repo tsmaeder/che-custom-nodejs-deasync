@@ -21,7 +21,7 @@ jobs:
   pre-compiler:
     strategy:
       matrix:
-        platform: ['linux/amd64']
+        platform: ['linux/amd64', 'linux/arm64', 'linux/ppc64le', 'linux/s390x']
     runs-on: ubuntu-latest
     steps:
     - name: Clone source code
@@ -73,9 +73,6 @@ jobs:
         docker buildx build --cache-from="type=registry,ref=${CACHE_IMAGE_TAG}" --cache-to="type=registry,ref=${CACHE_IMAGE_TAG},mode=max" --platform "${{matrix.platform}}" -t "${IMAGE_WITH_TAG}" --push .
   assemble:
     needs: compiler
-    strategy:
-      matrix:
-        platform: ['linux/amd64', 'linux/arm64', 'linux/ppc64le', 'linux/s390x']
     runs-on: ubuntu-latest
     steps:
     - name: Clone source code
