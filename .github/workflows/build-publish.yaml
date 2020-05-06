@@ -48,7 +48,7 @@ jobs:
     needs: pre-compiler
     strategy:
       matrix:
-        platform: ['linux/amd64']
+        platform: ['linux/amd64', 'linux/arm64', 'linux/ppc64le', 'linux/s390x']
     runs-on: ubuntu-latest
     steps:
     - name: Clone source code
@@ -75,7 +75,7 @@ jobs:
     needs: compiler
     strategy:
       matrix:
-        platform: ['linux/amd64']
+        platform: ['linux/amd64', 'linux/arm64', 'linux/ppc64le', 'linux/s390x']
     runs-on: ubuntu-latest
     steps:
     - name: Clone source code
@@ -94,9 +94,11 @@ jobs:
       run: |
         IMAGE_VERSION=$(cat VERSION)
         PLATFORM=$(echo ${{matrix.platform}} | tr '\/' '-') 
-        IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-multi-test"
+        IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}"
         echo "Creating manifest for multi-arch build "
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create ${IMAGE_WITH_TAG} \
+        ${IMAGE_NAME}:${IMAGE_VERSION}-linux-arm64 \
+        ${IMAGE_NAME}:${IMAGE_VERSION}-linux-ppc64le \
+        ${IMAGE_NAME}:${IMAGE_VERSION}-linux-s390x \
         ${IMAGE_NAME}:${IMAGE_VERSION}-linux-amd64
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push ${IMAGE_WITH_TAG}
-                                
