@@ -21,6 +21,7 @@ jobs:
         platform: ['linux/amd64']
     env:
       IMAGE_NAME: quay.io/eclipse/che-custom-nodejs-deasync
+      CACHE_IMAGE_NAME: chedockerfiles/custom-nodejs-deasync-cache
     runs-on: ubuntu-latest
     steps:
     - name: Clone source code
@@ -28,11 +29,9 @@ jobs:
       with:
         fetch-depth: 1
     - name: Docker login
-      uses: azure/docker-login@v1
-      with:
-        login-server: quay.io
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        docker login -u ${{ secrets.CACHE_USERNAME }} -p ${{ secrets.CACHE_PASSWORD }}
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} quay.io
     - name: Docker Buildx
       uses: crazy-max/ghaction-docker-buildx@v1.5.0
       with:
@@ -42,8 +41,9 @@ jobs:
         IMAGE_VERSION=$(cat VERSION)
         PLATFORM=$(echo ${{matrix.platform}} | tr '\/' '-') 
         IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-precompiler"
+        CACHE_IMAGE_TAG="${CACHE_IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-precompiler-cache"
         echo "Building ${IMAGE_WITH_TAG} on platform ${{matrix.platform}}"
-        docker buildx build --cache-from=type=registry,ref=${IMAGE_WITH_TAG} --platform "${{matrix.platform}}" -t "${IMAGE_WITH_TAG}" --target precompiler --push .
+        docker buildx build --cache-from="type=registry,ref=${CACHE_IMAGE_TAG}" --cache-to="type=registry,ref=${CACHE_IMAGE_TAG},mode=max" --platform "${{matrix.platform}}" -t "${IMAGE_WITH_TAG}" --target precompiler --push .
   compiler:
     needs: pre-compiler
     strategy:
@@ -58,11 +58,9 @@ jobs:
       with:
         fetch-depth: 1
     - name: Docker login
-      uses: azure/docker-login@v1
-      with:
-        login-server: quay.io
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        docker login -u ${{ secrets.CACHE_USERNAME }} -p ${{ secrets.CACHE_PASSWORD }}
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} quay.io
     - name: Docker Buildx
       uses: crazy-max/ghaction-docker-buildx@v1.5.0
       with:
@@ -72,9 +70,9 @@ jobs:
         IMAGE_VERSION=$(cat VERSION)
         PLATFORM=$(echo ${{matrix.platform}} | tr '\/' '-') 
         IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}"
-        PRECOMPILE_IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-precompiler"
+        PRECOMPILER_CACHE_IMAGE_TAG="${CACHE_IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-precompiler-cache"
         echo "Building ${IMAGE_WITH_TAG} on platform ${{matrix.platform}}"
-        docker buildx build --cache-from="type=registry,ref=${PRECOMPILE_IMAGE_WITH_TAG}" --platform "${{matrix.platform}}" -t "${IMAGE_WITH_TAG}" --push .
+        docker buildx build --cache-from="type=registry,ref=${PRECOMPILER_CACHE_IMAGE_TAG}" --platform "${{matrix.platform}}" -t "${IMAGE_WITH_TAG}" --push .
   assemble:
     needs: compiler
     strategy:
@@ -89,11 +87,9 @@ jobs:
       with:
         fetch-depth: 1
     - name: Docker login
-      uses: azure/docker-login@v1
-      with:
-        login-server: quay.io
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        docker login -u ${{ secrets.CACHE_USERNAME }} -p ${{ secrets.CACHE_PASSWORD }}
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} quay.io
     - name: Docker Buildx
       uses: crazy-max/ghaction-docker-buildx@v1.5.0
       with:
