@@ -14,14 +14,14 @@ on:
     branches:
       - 'master'
 
-jobs:
+  env:
+    IMAGE_NAME: quay.io/eclipse/che-custom-nodejs-deasync
+    CACHE_IMAGE_NAME: chedockerfiles/custom-nodejs-deasync-cache
+  jobs:
   pre-compiler:
     strategy:
       matrix:
         platform: ['linux/amd64']
-    env:
-      IMAGE_NAME: quay.io/eclipse/che-custom-nodejs-deasync
-      CACHE_IMAGE_NAME: chedockerfiles/custom-nodejs-deasync-cache
     runs-on: ubuntu-latest
     steps:
     - name: Clone source code
@@ -49,8 +49,6 @@ jobs:
     strategy:
       matrix:
         platform: ['linux/amd64']
-    env:
-      IMAGE_NAME: quay.io/eclipse/che-custom-nodejs-deasync
     runs-on: ubuntu-latest
     steps:
     - name: Clone source code
@@ -78,8 +76,6 @@ jobs:
     strategy:
       matrix:
         platform: ['linux/amd64']
-    env:
-      IMAGE_NAME: quay.io/eclipse/che-custom-nodejs-deasync
     runs-on: ubuntu-latest
     steps:
     - name: Clone source code
