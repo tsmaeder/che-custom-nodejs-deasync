@@ -13,6 +13,7 @@ on:
   push:
     branches:
       - 'master'
+
 env:
   IMAGE_NAME: quay.io/eclipse/che-custom-nodejs-deasync
   CACHE_IMAGE_NAME: chedockerfiles/custom-nodejs-deasync-cache
