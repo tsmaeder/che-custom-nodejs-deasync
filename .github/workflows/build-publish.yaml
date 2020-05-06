@@ -97,9 +97,6 @@ jobs:
         IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-multi-test"
         echo "Creating manifest for multi-arch build "
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create ${IMAGE_WITH_TAG} \
-        ${IMAGE_NAME}:${IMAGE_VERSION}-linux-arm64 \
-        ${IMAGE_NAME}:${IMAGE_VERSION}-linux-ppc64le \
-        ${IMAGE_NAME}:${IMAGE_VERSION}-linux-s390x \
         ${IMAGE_NAME}:${IMAGE_VERSION}-linux-amd64
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push ${IMAGE_WITH_TAG}
                                 
