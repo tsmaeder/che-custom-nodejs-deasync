@@ -44,7 +44,7 @@ jobs:
         IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-precompiler"
         CACHE_IMAGE_TAG="${CACHE_IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-precompiler-cache"
         echo "Building ${IMAGE_WITH_TAG} on platform ${{matrix.platform}}"
-        docker buildx build --cache-from="type=registry,ref=${CACHE_IMAGE_TAG}" --cache-to="type=registry,ref=${CACHE_IMAGE_TAG},mode=max" --platform "${{matrix.platform}}" --target precompiler -t ${IMAGE_WITH_TAG} --push .
+        docker buildx build --cache-from="type=registry,ref=${CACHE_IMAGE_TAG}" --cache-to="type=registry,ref=${CACHE_IMAGE_TAG},mode=max" --platform "${{matrix.platform}}" --target precompiler .
   compiler:
     needs: pre-compiler
     strategy:
@@ -91,8 +91,7 @@ jobs:
     - name: Create multi-arch image
       run: |
         IMAGE_VERSION=$(cat VERSION)
-        PLATFORM=$(echo ${{matrix.platform}} | tr '\/' '-') 
-        IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}"
+        IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}"
         echo "Creating manifest for multi-arch build "
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create ${IMAGE_WITH_TAG} \
         ${IMAGE_NAME}:${IMAGE_VERSION}-linux-arm64 \
