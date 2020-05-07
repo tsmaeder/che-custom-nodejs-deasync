@@ -44,7 +44,7 @@ jobs:
         IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-precompiler"
         CACHE_IMAGE_TAG="${CACHE_IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-precompiler-cache"
         echo "Building ${IMAGE_WITH_TAG} on platform ${{matrix.platform}}"
-        docker buildx build --cache-from="type=registry,ref=${CACHE_IMAGE_TAG}" --cache-to="type=registry,ref=${CACHE_IMAGE_TAG},mode=max" --platform "${{matrix.platform}}" --target precompiler .
+        docker buildx build --cache-from="type=registry,ref=${CACHE_IMAGE_TAG}" --cache-to="type=registry,ref=${CACHE_IMAGE_TAG},mode=max" --platform "${{matrix.platform}}" --target precompiler --push .
   compiler:
     needs: pre-compiler
     strategy:
