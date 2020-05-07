@@ -22,13 +22,15 @@ ENV NEXE_VERSION=${NEXE_VERSION}
 ENV TIMEOUT_DELAY=${TIMEOUT_DELAY}
 RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers paxctl libgcc libstdc++ git vim tar gzip wget coreutils
 RUN mkdir /${NODE_VERSION} && \
-    curl -sSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz | tar -zx --strip-components=1 -C /${NODE_VERSION} && \
-    find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
+    curl -sSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz | tar -zx --strip-components=1 -C /${NODE_VERSION}
 
 WORKDIR /${NODE_VERSION}
 
 # Add the .cc and .js for deasync
 COPY etc/ /${NODE_VERSION}
+
+#change timestamp
+RUN find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
 
 # configure
 RUN ./configure --prefix=/usr --fully-static
@@ -51,7 +53,6 @@ ARG NEXE_VERSION
 ENV NODE_VERSION=${NODE_VERSION}
 ENV NEXE_VERSION=${NEXE_VERSION}
 RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers paxctl libgcc libstdc++ git vim tar gzip wget
-RUN mkdir /${NODE_VERSION} && curl -sSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz | tar -zx --strip-components=1 -C /${NODE_VERSION}
 COPY --from=precompiler /${NODE_VERSION} /${NODE_VERSION}
 RUN find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
 WORKDIR /${NODE_VERSION}
