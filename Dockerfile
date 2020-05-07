@@ -12,7 +12,7 @@
 ARG NEXE_VERSION=3.3.2
 ARG NODE_VERSION=10.20.1
 # around 5 hours delay
-ARG TIMEOUT_DELAY=18000
+ARG TIMEOUT_DELAY=20000
 FROM alpine:3.11.6 as precompiler
 ARG NODE_VERSION
 ARG NEXE_VERSION
@@ -52,7 +52,7 @@ ARG NODE_VERSION
 ARG NEXE_VERSION
 ENV NODE_VERSION=${NODE_VERSION}
 ENV NEXE_VERSION=${NEXE_VERSION}
-RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers paxctl libgcc libstdc++ git vim tar gzip wget
+RUN apk add --no-cache make gcc g++ binutils-gold python linux-headers paxctl libgcc libstdc++ git vim tar gzip wget
 COPY --from=precompiler /${NODE_VERSION} /${NODE_VERSION}
 RUN find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
 WORKDIR /${NODE_VERSION}
