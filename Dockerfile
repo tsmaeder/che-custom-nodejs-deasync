@@ -10,7 +10,7 @@
 
 
 ARG NEXE_VERSION=3.3.2
-ARG NODE_VERSION=10.20.1
+ARG NODE_VERSION=10.21.0
 # around 5 hours delay
 ARG TIMEOUT_DELAY=20000
 FROM alpine:3.11.6 as precompiler
