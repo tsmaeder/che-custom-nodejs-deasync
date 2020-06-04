@@ -34,7 +34,7 @@ jobs:
         docker login -u ${{ secrets.CACHE_USERNAME }} -p ${{ secrets.CACHE_PASSWORD }}
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} quay.io
     - name: Docker Buildx
-      uses: crazy-max/ghaction-docker-buildx@v1.5.0
+      uses: crazy-max/ghaction-docker-buildx@v2.0.1
       with:
         version: v0.4.1
     - name: Docker build, tag, and push
