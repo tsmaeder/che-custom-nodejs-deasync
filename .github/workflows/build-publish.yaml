@@ -71,7 +71,7 @@ jobs:
         IMAGE_WITH_TAG="${IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}"
         CACHE_IMAGE_TAG="${CACHE_IMAGE_NAME}:${IMAGE_VERSION}-${PLATFORM}-precompiler-cache"
         echo "Building ${IMAGE_WITH_TAG} on platform ${{matrix.platform}}"
-        docker buildx build --cache-from="type=registry,ref=${CACHE_IMAGE_TAG}" --cache-to="type=registry,ref=${CACHE_IMAGE_TAG},mode=max" --platform "${{matrix.platform}}" -t "${IMAGE_WITH_TAG}" --push .
+        docker buildx build --cache-from="type=registry,ref=${CACHE_IMAGE_TAG}" --platform "${{matrix.platform}}" -t "${IMAGE_WITH_TAG}" --push .
   assemble:
     needs: compiler
     runs-on: ubuntu-latest
