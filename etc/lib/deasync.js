@@ -22,7 +22,7 @@
  * Released under the MIT license
  */
 
-const binding = process.binding('deasync');
+const binding = internalBinding('deasync');
 
 function deasync(fn) {
 	return function () {

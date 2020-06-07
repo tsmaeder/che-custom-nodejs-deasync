@@ -20,6 +20,9 @@
 #include "node_internals.h"
 #include <uv.h>
 #include <v8.h>
+#include "env-inl.h"
+#include "node_native_module_env.h"
+#include "node_options.h"
 
 namespace node {
 
@@ -46,7 +49,7 @@ namespace node {
       return args.GetReturnValue().SetUndefined();
     }
 
-    void Initialize(Local<Object> target,
+   void Initialize(Local<Object> target,
                     Local<Value> unused,
                     Local<Context> context,
                     void* priv) {
@@ -57,4 +60,4 @@ namespace node {
   } // namespace deasync
 } // namespace node
 
-NODE_BUILTIN_MODULE_CONTEXT_AWARE(deasync, node::deasync::Initialize);
+NODE_MODULE_CONTEXT_AWARE_INTERNAL(deasync, node::deasync::Initialize);

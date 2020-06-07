@@ -10,7 +10,7 @@
 
 
 ARG NEXE_VERSION=3.3.2
-ARG NODE_VERSION=10.21.0
+ARG NODE_VERSION=12.18.0
 # around 5 hours delay
 ARG TIMEOUT_DELAY=20000
 FROM alpine:3.11.6 as precompiler
@@ -42,7 +42,7 @@ RUN \
    # Include the .cc in src list
    sed -i -e "s|        'src/uv.cc',|        'src/uv.cc',\n        'src/deasync.cc',|" node.gyp && \
    # Include the deasync module in modules list
-   sed -i -e "s|    V(messaging)                                                              \\\|    V(messaging)                                                              \\\ \n    V(deasync)                                                                \\\|" src/node_internals.h
+   sed -i -e "s|  V(messaging)                                                                 \\\|  V(messaging)                                                                 \\\ \n  V(deasync)                                                                   \\\|" src/node_binding.cc
 
 # Compile with a given timeframe
 RUN timeout -s SIGINT ${TIMEOUT_DELAY} make -j 8 || echo "build aborted"
