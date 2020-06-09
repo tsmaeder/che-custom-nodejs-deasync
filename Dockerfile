@@ -33,7 +33,7 @@ RUN find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
 
 # configure
 RUN CONF_OPTS="" && case $(uname -m) in \
-       s390x) CONF_OPTS="--without-intl";; \
+       s390x) CONF_OPTS="--with-intl=small-icu";; \
     esac && \
     echo "Extra configure flags: ${CONF_OPTS}" && \
    ./configure --prefix=/usr --fully-static ${CONF_OPTS}
