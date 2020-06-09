@@ -9,10 +9,10 @@
 #   Red Hat, Inc. - initial API and implementation
 
 ARG NEXE_VERSION=4.0.0-beta.7
-ARG NODE_VERSION=12.16.3
+ARG NODE_VERSION=12.18.0
 # around 5 hours delay
 ARG TIMEOUT_DELAY=20000
-FROM alpine:3.11.6 as precompiler
+FROM alpine:3.12.0 as precompiler
 ARG NODE_VERSION
 ARG NEXE_VERSION
 ARG TIMEOUT_DELAY
@@ -46,7 +46,7 @@ RUN \
 # Compile with a given timeframe
 RUN timeout -s SIGINT ${TIMEOUT_DELAY} make -j 8 || echo "build aborted"
 
-FROM alpine:3.11.6 as compiler
+FROM alpine:3.12.0 as compiler
 ARG NODE_VERSION
 ARG NEXE_VERSION
 ENV NODE_VERSION=${NODE_VERSION}
@@ -75,6 +75,6 @@ RUN echo "console.log('hello world')" >> index.js
 RUN nexe --build --no-mangle --temp / -c="--fully-static" -m="-j8" --target ${NODE_VERSION} -o pre-assembly-nodejs-static
 
 # ok now make the image smaller with only the binary
-FROM alpine:3.11.6 as runtime
+FROM alpine:3.12.0 as runtime
 COPY --from=compiler /pre-assembly-nodejs-static /pre-assembly-nodejs-static
 
