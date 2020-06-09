@@ -9,7 +9,7 @@
 #   Red Hat, Inc. - initial API and implementation
 
 ARG NEXE_VERSION=4.0.0-beta.7
-ARG NODE_VERSION=12.18.0
+ARG NODE_VERSION=12.17.0
 # around 5 hours delay
 ARG TIMEOUT_DELAY=20000
 FROM alpine:3.12.0 as precompiler
