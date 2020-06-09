@@ -32,7 +32,11 @@ COPY etc/ /${NODE_VERSION}
 RUN find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
 
 # configure
-RUN ./configure --prefix=/usr --fully-static --with-intl=small-icu
+RUN CONF_OPTS="" && case $(uname -m) in \
+       s390x) CONF_OPTS="--without-intl";; \
+    esac && \
+    echo "Extra configure flags: ${CONF_OPTS}" && \
+   ./configure --prefix=/usr --fully-static ${CONF_OPTS}
 
 # Include the node-gyp module converted to 'builtin' module
 RUN \
@@ -44,7 +48,8 @@ RUN \
    sed -i -e "s|  V(messaging)                                                                 \\\|  V(messaging)                                                                 \\\ \n  V(deasync)                                                                   \\\|" src/node_binding.cc
 
 # Compile with a given timeframe
-RUN timeout -s SIGINT ${TIMEOUT_DELAY} make -j 8 || echo "build aborted"
+RUN echo "CPU: $(getconf _NPROCESSORS_ONLN)" && \
+    timeout -s SIGINT ${TIMEOUT_DELAY} make -j $(getconf _NPROCESSORS_ONLN) || echo "build aborted"
 
 FROM alpine:3.12.0 as compiler
 ARG NODE_VERSION
@@ -72,7 +77,7 @@ WORKDIR /
 RUN echo "console.log('hello world')" >> index.js
 
 # Build pre-asssembly of nodejs by using nexe and reusing our patched nodejs folder
-RUN nexe --build --no-mangle --temp / -c="--fully-static" -m="-j8" --target ${NODE_VERSION} -o pre-assembly-nodejs-static
+RUN nexe --build --no-mangle --temp / -c="--fully-static" -m="-j$(getconf _NPROCESSORS_ONLN)" --target ${NODE_VERSION} -o pre-assembly-nodejs-static
 
 # ok now make the image smaller with only the binary
 FROM alpine:3.12.0 as runtime
