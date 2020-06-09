@@ -8,7 +8,7 @@
 # Contributors:
 #   Red Hat, Inc. - initial API and implementation
 
-ARG NEXE_VERSION=3.3.2
+ARG NEXE_VERSION=4.0.0-beta.7
 ARG NODE_VERSION=12.18.0
 # around 5 hours delay
 ARG TIMEOUT_DELAY=20000
