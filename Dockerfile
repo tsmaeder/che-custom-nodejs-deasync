@@ -9,7 +9,7 @@
 #   Red Hat, Inc. - initial API and implementation
 
 ARG NEXE_VERSION=4.0.0-beta.7
-ARG NODE_VERSION=12.17.0
+ARG NODE_VERSION=12.18.0
 # around 5 hours delay
 ARG TIMEOUT_DELAY=20000
 FROM alpine:3.12.0 as precompiler
@@ -32,7 +32,7 @@ COPY etc/ /${NODE_VERSION}
 RUN find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
 
 # configure
-RUN ./configure --prefix=/usr --fully-static
+RUN ./configure --prefix=/usr --fully-static --with-intl=small-icu
 
 # Include the node-gyp module converted to 'builtin' module
 RUN \
