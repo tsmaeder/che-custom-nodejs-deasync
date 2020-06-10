@@ -37,6 +37,7 @@ jobs:
       uses: crazy-max/ghaction-docker-buildx@v3.1.0
       with:
         buildx-version: v0.3.0
+        qemu-version: v4.2.0-7
     - name: Docker build, tag, and push
       run: |
         IMAGE_VERSION=$(cat VERSION)
@@ -64,6 +65,7 @@ jobs:
       uses: crazy-max/ghaction-docker-buildx@v3.1.0
       with:
         buildx-version: v0.3.0
+        qemu-version: v4.2.0-7
     - name: Docker build, tag, and push
       run: |
         IMAGE_VERSION=$(cat VERSION)
