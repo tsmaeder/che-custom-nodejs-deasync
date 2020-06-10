@@ -22,7 +22,7 @@ jobs:
   pre-compiler:
     strategy:
       matrix:
-        platform: ['linux/amd64', 'linux/arm64', 'linux/ppc64le']
+        platform: ['linux/amd64', 'linux/arm64', 'linux/ppc64le', 'linux/s390x']
     runs-on: ubuntu-latest
     steps:
     - name: Clone source code
@@ -34,9 +34,9 @@ jobs:
         docker login -u ${{ secrets.CACHE_USERNAME }} -p ${{ secrets.CACHE_PASSWORD }}
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} quay.io
     - name: Docker Buildx
-      uses: crazy-max/ghaction-docker-buildx@v2.0.1
+      uses: crazy-max/ghaction-docker-buildx@v3.1.0
       with:
-        version: v0.4.1
+        version: v0.3.0
     - name: Docker build, tag, and push
       run: |
         IMAGE_VERSION=$(cat VERSION)
@@ -49,7 +49,7 @@ jobs:
     needs: pre-compiler
     strategy:
       matrix:
-        platform: ['linux/amd64', 'linux/arm64', 'linux/ppc64le']
+        platform: ['linux/amd64', 'linux/arm64', 'linux/ppc64le', 'linux/s390x']
     runs-on: ubuntu-latest
     steps:
     - name: Clone source code
@@ -61,9 +61,9 @@ jobs:
         docker login -u ${{ secrets.CACHE_USERNAME }} -p ${{ secrets.CACHE_PASSWORD }}
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} quay.io
     - name: Docker Buildx
-      uses: crazy-max/ghaction-docker-buildx@v1.5.0
+      uses: crazy-max/ghaction-docker-buildx@v3.1.0
       with:
-        version: v0.4.1
+        version: v0.3.0
     - name: Docker build, tag, and push
       run: |
         IMAGE_VERSION=$(cat VERSION)
@@ -96,5 +96,6 @@ jobs:
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create ${IMAGE_WITH_TAG} \
         ${IMAGE_NAME}:${IMAGE_VERSION}-linux-arm64 \
         ${IMAGE_NAME}:${IMAGE_VERSION}-linux-ppc64le \
+        ${IMAGE_NAME}:${IMAGE_VERSION}-linux-s390x \
         ${IMAGE_NAME}:${IMAGE_VERSION}-linux-amd64
         DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push ${IMAGE_WITH_TAG}
