@@ -19,8 +19,7 @@ ARG TIMEOUT_DELAY
 ENV NODE_VERSION=${NODE_VERSION}
 ENV NEXE_VERSION=${NEXE_VERSION}
 ENV TIMEOUT_DELAY=${TIMEOUT_DELAY}
-RUN apk add --no-cache curl make gcc g++ binutils-gold python3 linux-headers libgcc libstdc++ git vim tar gzip wget coreutils && \
-    ln -s /usr/bin/python3 /usr/bin/python
+RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers libgcc libstdc++ git vim tar gzip wget coreutils
 RUN mkdir /${NODE_VERSION} && \
     curl -sSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz | tar -zx --strip-components=1 -C /${NODE_VERSION}
 
@@ -34,7 +33,7 @@ RUN find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
 
 # configure
 RUN CONF_OPTS="" && case $(uname -m) in \
-       s390x) CONF_OPTS="--with-intl=small-icu";; \
+       s390x) CONF_OPTS="--without-intl";; \
     esac && \
     echo "Extra configure flags: ${CONF_OPTS}" && \
    ./configure --prefix=/usr --fully-static ${CONF_OPTS}
@@ -49,7 +48,7 @@ RUN \
    sed -i -e "s|  V(messaging)                                                                 \\\|  V(messaging)                                                                 \\\ \n  V(deasync)                                                                   \\\|" src/node_binding.cc
 
 # Compile with a given timeframe
-RUN echo "CPU: $(getconf _NPROCESSORS_ONLN)" && \
+RUN echo "CPU(s): $(getconf _NPROCESSORS_ONLN)" && \
     timeout -s SIGINT ${TIMEOUT_DELAY} make -j $(getconf _NPROCESSORS_ONLN) || echo "build aborted"
 
 FROM alpine:3.12.0 as compiler
@@ -57,8 +56,7 @@ ARG NODE_VERSION
 ARG NEXE_VERSION
 ENV NODE_VERSION=${NODE_VERSION}
 ENV NEXE_VERSION=${NEXE_VERSION}
-RUN apk add --no-cache make gcc g++ binutils-gold python3 linux-headers libgcc libstdc++ git vim tar gzip wget && \
-    ln -s /usr/bin/python3 /usr/bin/python
+RUN apk add --no-cache make gcc g++ binutils-gold python2 linux-headers libgcc libstdc++ git vim tar gzip wget
 COPY --from=precompiler /${NODE_VERSION} /${NODE_VERSION}
 RUN find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
 WORKDIR /${NODE_VERSION}
