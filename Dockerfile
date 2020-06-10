@@ -19,7 +19,7 @@ ARG TIMEOUT_DELAY
 ENV NODE_VERSION=${NODE_VERSION}
 ENV NEXE_VERSION=${NEXE_VERSION}
 ENV TIMEOUT_DELAY=${TIMEOUT_DELAY}
-RUN apk add --no-cache curl make gcc g++ binutils-gold python linux-headers libgcc libstdc++ git vim tar gzip wget coreutils
+RUN apk add --no-cache curl make gcc g++ binutils-gold python2 linux-headers libgcc libstdc++ git vim tar gzip wget coreutils
 RUN mkdir /${NODE_VERSION} && \
     curl -sSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz | tar -zx --strip-components=1 -C /${NODE_VERSION}
 
