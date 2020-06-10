@@ -36,7 +36,7 @@ jobs:
     - name: Docker Buildx
       uses: crazy-max/ghaction-docker-buildx@v3.1.0
       with:
-        version: v0.3.0
+        buildx-version: v0.3.0
     - name: Docker build, tag, and push
       run: |
         IMAGE_VERSION=$(cat VERSION)
@@ -63,7 +63,7 @@ jobs:
     - name: Docker Buildx
       uses: crazy-max/ghaction-docker-buildx@v3.1.0
       with:
-        version: v0.3.0
+        buildx-version: v0.3.0
     - name: Docker build, tag, and push
       run: |
         IMAGE_VERSION=$(cat VERSION)
