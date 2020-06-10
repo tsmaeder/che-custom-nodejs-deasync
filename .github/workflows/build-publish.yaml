@@ -89,7 +89,8 @@ jobs:
     - name: Docker Buildx
       uses: crazy-max/ghaction-docker-buildx@v1.5.0
       with:
-        version: v0.4.1
+        buildx-version: v0.3.0
+        qemu-version: v4.2.0-7
     - name: Create multi-arch image
       run: |
         IMAGE_VERSION=$(cat VERSION)
