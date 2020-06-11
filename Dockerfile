@@ -32,11 +32,7 @@ COPY etc/ /${NODE_VERSION}
 RUN find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
 
 # configure
-RUN CONF_OPTS="" && case $(uname -m) in \
-       s390x) CONF_OPTS="--without-intl";; \
-    esac && \
-    echo "Extra configure flags: ${CONF_OPTS}" && \
-   ./configure --prefix=/usr --fully-static ${CONF_OPTS}
+RUN ./configure --prefix=/usr --fully-static
 
 # Include the node-gyp module converted to 'builtin' module
 RUN \
