@@ -29,7 +29,7 @@ WORKDIR /${NODE_VERSION}
 COPY etc/ /${NODE_VERSION}
 
 #change timestamp
-RUN find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
+RUN find /${NODE_VERSION} -print0 | xargs -0 touch -a -m -t 202001010000.00
 
 # configure
 RUN ./configure --prefix=/usr --fully-static
@@ -54,7 +54,7 @@ ENV NODE_VERSION=${NODE_VERSION}
 ENV NEXE_VERSION=${NEXE_VERSION}
 RUN apk add --no-cache make gcc g++ binutils-gold python2 linux-headers libgcc libstdc++ git vim tar gzip wget
 COPY --from=precompiler /${NODE_VERSION} /${NODE_VERSION}
-RUN find /${NODE_VERSION} | xargs touch -a -m -t 202001010000.00
+RUN find /${NODE_VERSION} -print0 | xargs -0 touch -a -m -t 202001010000.00
 WORKDIR /${NODE_VERSION}
 
 # resume compilation
