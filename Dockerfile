@@ -21,12 +21,11 @@ ENV NEXE_VERSION=${NEXE_VERSION}
 ENV TIMEOUT_DELAY=${TIMEOUT_DELAY}
 RUN apk add --no-cache curl make gcc g++ binutils-gold python2 linux-headers libgcc libstdc++ git vim tar gzip wget coreutils
 RUN mkdir /${NODE_VERSION} && \
-    curl -sSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz | tar -zx --strip-components=1 -C /${NODE_VERSION}
+    curl -sSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}.tar.gz | tar -zx --strip-components=1 -C /${NODE_VERSION} && \
+    # patch source to work on z until https://github.com/nodejs/node/pull/30199 is merged
+    sed -E -i "s|o\['libraries'\] \+= \['-static'\]|o\['libraries'\] \+= \['-static', '-no-pie'\]|g" /${NODE_VERSION}/configure.py
 
 WORKDIR /${NODE_VERSION}
-
-# patch source to work on z until https://github.com/nodejs/node/pull/30199 is merged
-RUN if [[ "$(uname -m)" == "s390x" ]] ; then sed -E -i "s|o\['libraries'\] \+= \['-static'\]|o\['libraries'\] \+= \['-static', '-no-pie'\]|g" configure.py ; fi
 
 # Add the .cc and .js for deasync
 COPY etc/ /${NODE_VERSION}
@@ -55,13 +54,13 @@ ARG NODE_VERSION
 ARG NEXE_VERSION
 ENV NODE_VERSION=${NODE_VERSION}
 ENV NEXE_VERSION=${NEXE_VERSION}
-RUN apk add --no-cache make gcc g++ binutils-gold python2 linux-headers libgcc libstdc++ git vim tar gzip wget
+RUN apk add --no-cache curl make gcc g++ binutils-gold python2 linux-headers libgcc libstdc++ git vim tar gzip wget coreutils
 COPY --from=precompiler /${NODE_VERSION} /${NODE_VERSION}
 RUN find /${NODE_VERSION} -print0 | xargs -0 touch -a -m -t 202001010000.00
 WORKDIR /${NODE_VERSION}
 
 # resume compilation
-RUN make -j 8 -&& make install
+RUN make -j $(getconf _NPROCESSORS_ONLN) && make install
 
 # install nexe
 RUN npm install -g nexe@${NEXE_VERSION}
