@@ -1,0 +1,20 @@
+FROM che-dockerfiles/che-custom-nodejs-deasync:latest
+RUN apk add --no-cache git nodejs npm
+ENV NEXE_FLAGS="--target 'alpine-x64-12' --temp /tmp/nexe-cache --resource './public/**/*'"
+COPY test /test
+# install specific nexe
+WORKDIR /
+RUN git clone https://github.com/nexe/nexe
+WORKDIR /nexe
+RUN git checkout ${NEXE_SHA1} && npm install && npm run build
+# Change back to root folder
+WORKDIR /
+
+## Add dummy sample to create the all-in-one ready-to-use package
+RUN mkdir /tmp/nexe-cache && cp /alpine-x64-12 /tmp/nexe-cache/alpine-x64-12
+WORKDIR /test
+RUN eval /nexe/index.js -i ./main.js ${NEXE_FLAGS} -o /test/test
+RUN timeout -s SIGINT 5 /test/test > /test/test-output 2>&1
+RUN echo "output is" && cat /test/test-output
+RUN if [ "$(cat /test/test-output)" == "In a subprocess" ]; then echo "expected output is there"; else echo "Output is not expected"; exit 1; fi
+

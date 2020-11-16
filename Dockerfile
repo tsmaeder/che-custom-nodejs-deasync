@@ -8,16 +8,14 @@
 # Contributors:
 #   Red Hat, Inc. - initial API and implementation
 
-ARG NEXE_VERSION=v4.0.0-beta.14
-ARG NODE_VERSION=12.18.3
+ARG NEXE_SHA1=0f0869b292f1d7b68ba6e170d628de68a10c009f
+ARG NODE_VERSION=12.18.4
 # around 5 hours delay
 ARG TIMEOUT_DELAY=21000
-FROM alpine:3.12.0 as precompiler
+FROM alpine:3.12.1 as precompiler
 ARG NODE_VERSION
-ARG NEXE_VERSION
 ARG TIMEOUT_DELAY
 ENV NODE_VERSION=${NODE_VERSION}
-ENV NEXE_VERSION=${NEXE_VERSION}
 ENV TIMEOUT_DELAY=${TIMEOUT_DELAY}
 RUN apk add --no-cache curl make gcc g++ binutils-gold python2 linux-headers libgcc libstdc++ git vim tar gzip wget coreutils
 RUN mkdir /${NODE_VERSION} && \
@@ -49,11 +47,11 @@ RUN \
 RUN echo "CPU(s): $(getconf _NPROCESSORS_ONLN)" && \
     timeout -s SIGINT ${TIMEOUT_DELAY} make -j $(getconf _NPROCESSORS_ONLN) || echo "build aborted"
 
-FROM alpine:3.12.0 as compiler
+FROM alpine:3.12.1 as compiler
 ARG NODE_VERSION
-ARG NEXE_VERSION
+ARG NEXE_SHA1
 ENV NODE_VERSION=${NODE_VERSION}
-ENV NEXE_VERSION=${NEXE_VERSION}
+ENV NEXE_SHA1=${NEXE_SHA1}
 RUN apk add --no-cache curl make gcc g++ binutils-gold python2 linux-headers libgcc libstdc++ git vim tar gzip wget coreutils
 COPY --from=precompiler /${NODE_VERSION} /${NODE_VERSION}
 RUN find /${NODE_VERSION} -print0 | xargs -0 touch -a -m -t 202001010000.00
@@ -62,12 +60,14 @@ WORKDIR /${NODE_VERSION}
 # resume compilation
 RUN make -j $(getconf _NPROCESSORS_ONLN) && make install
 
-# install nexe
-RUN npm install -g nexe@${NEXE_VERSION}
-
 # remove node binary
 RUN rm out/Release/node
 
+# install specific nexe
+WORKDIR /
+RUN git clone https://github.com/nexe/nexe
+WORKDIR /nexe
+RUN git checkout ${NEXE_SHA1} && npm install && npm run build
 # Change back to root folder
 WORKDIR /
 
@@ -75,9 +75,14 @@ WORKDIR /
 RUN echo "console.log('hello world')" >> index.js
 
 # Build pre-asssembly of nodejs by using nexe and reusing our patched nodejs folder
-RUN nexe --build --no-mangle --temp / -c="--fully-static" -m="-j$(getconf _NPROCESSORS_ONLN)" --target ${NODE_VERSION} -o pre-assembly-nodejs-static
+RUN /nexe/index.js --build --no-mangle --enableNodeCli --temp / -c="--fully-static" -m="-j$(getconf _NPROCESSORS_ONLN)" --target ${NODE_VERSION} -o alpine-x64-12
+
 
 # ok now make the image smaller with only the binary
-FROM alpine:3.12.0 as runtime
-COPY --from=compiler /pre-assembly-nodejs-static /pre-assembly-nodejs-static
+FROM alpine:3.12.1 as runtime
+ARG NEXE_SHA1
+ARG NODE_VERSION
+ENV NODE_VERSION=${NODE_VERSION}
+ENV NEXE_SHA1=${NEXE_SHA1}
+COPY --from=compiler /alpine-x64-12 /alpine-x64-12
 
