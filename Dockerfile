@@ -8,8 +8,8 @@
 # Contributors:
 #   Red Hat, Inc. - initial API and implementation
 
-ARG NEXE_SHA1=0f0869b292f1d7b68ba6e170d628de68a10c009f
-ARG NODE_VERSION=12.18.4
+ARG NEXE_VERSION=v4.0.0-beta.14
+ARG NODE_VERSION=12.18.2
 # around 5 hours delay
 ARG TIMEOUT_DELAY=21000
 FROM alpine:3.12.1 as precompiler
@@ -75,8 +75,8 @@ WORKDIR /
 RUN echo "console.log('hello world')" >> index.js
 
 # Build pre-asssembly of nodejs by using nexe and reusing our patched nodejs folder
-RUN /nexe/index.js --build --no-mangle --enableNodeCli --temp / -c="--fully-static" -m="-j$(getconf _NPROCESSORS_ONLN)" --target ${NODE_VERSION} -o alpine-x64-12
 
+RUN nexe --build --enableNodeCli --no-mangle --temp / -c="--fully-static" -m="-j$(getconf _NPROCESSORS_ONLN)" --target ${NODE_VERSION} -o pre-assembly-nodejs-static
 
 # ok now make the image smaller with only the binary
 FROM alpine:3.12.1 as runtime
